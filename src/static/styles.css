@@ -142,3 +142,33 @@ footer {
   padding: 20px;
   color: #666;
 }
+
+/* Replace the participants-list rules with the following to hide bullets and keep clean spacing */
+
+.participants-list {
+  margin-top: 10px;
+  padding-left: 0;     /* remove left padding so default bullets don't create extra space */
+  list-style: none;    /* hide default bullets */
+}
+
+.participants-list li {
+  margin: 6px 0;
+  padding: 8px 12px;
+  padding-left: 12px;  /* maintain internal spacing now that bullets are gone */
+  background: linear-gradient(90deg, #f4f8ff, #ffffff);
+  border-left: 4px solid #1a237e;
+  border-radius: 6px;
+  color: #1a237e;
+  font-weight: 600;
+  font-size: 0.95rem;
+  list-style: none;    /* extra guard to ensure no bullets show */
+}
+
+.participants-list li.empty {
+  color: #666;
+  font-weight: 500;
+  background: transparent;
+  border-left: 4px solid transparent;
+  font-style: italic;
+  padding-left: 0;     /* keep the "no participants" line aligned without extra padding */
+}
