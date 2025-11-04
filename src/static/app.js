@@ -35,43 +35,85 @@ document.addEventListener("DOMContentLoaded", () => {
         title.textContent = name;
         card.appendChild(title);
 
-        const desc = document.createElement("p");
-        desc.textContent = info.description || "";
-        card.appendChild(desc);
+        // Use a definition list for activity details instead of <p>/<strong>
+        const details = document.createElement("dl");
+        details.className = "activity-details";
 
-        const schedule = document.createElement("p");
-        schedule.innerHTML = `<strong>When:</strong> ${info.schedule || "TBD"}`;
-        card.appendChild(schedule);
+        function addDetail(label, content, valueClass) {
+          const dt = document.createElement("dt");
+          dt.className = "detail-term";
+          dt.textContent = label;
 
-        const capacity = document.createElement("p");
+          const dd = document.createElement("dd");
+          dd.className = valueClass || "detail-value";
+          if (content instanceof Node) dd.appendChild(content);
+          else dd.textContent = content;
+
+          details.appendChild(dt);
+          details.appendChild(dd);
+          return dd;
+        }
+
+        // Description
+        addDetail("Description", info.description || "", "detail-description");
+
+        // Schedule / When
+        addDetail("When", info.schedule || "TBD", "detail-schedule");
+
+        // Capacity -> show available slots only (no title attributes)
         const current = Array.isArray(info.participants) ? info.participants.length : 0;
-        capacity.innerHTML = `<strong>Capacity:</strong> ${current} / ${info.max_participants || "—"}`;
-        capacity.className = "participant-count";
-        card.appendChild(capacity);
+        const max = Number.isFinite(info.max_participants) ? info.max_participants : 0;
+        const available = Math.max(0, max - current);
+        addDetail("Available Slots", String(available), "participant-count");
 
-        // Participants list section
-        const participantsHeading = document.createElement("p");
-        participantsHeading.innerHTML = `<strong>Participants:</strong>`;
-        card.appendChild(participantsHeading);
-
+        // Participants list (ul will be attached inside the dd)
         const ul = document.createElement("ul");
         ul.className = "participants-list";
 
         if (Array.isArray(info.participants) && info.participants.length > 0) {
+          // only render participants list when there is at least one participant
           info.participants.forEach((p) => {
             const li = document.createElement("li");
             li.className = "participant";
-            li.textContent = p;
+
+            // participant name span
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "participant-name";
+            nameSpan.textContent = p;
+            li.appendChild(nameSpan);
+
+            // delete button
+            const delBtn = document.createElement("button");
+            delBtn.className = "delete-btn";
+            delBtn.type = "button";
+            delBtn.innerHTML = "✕";
+
+            delBtn.addEventListener("click", async () => {
+              if (!confirm(`Remove ${p} from ${name}?`)) return;
+              try {
+                const url = `/activities/${encodeURIComponent(name)}/participants?email=${encodeURIComponent(p)}`;
+                const res = await fetch(url, { method: "DELETE" });
+                const json = await res.json();
+                if (res.ok) {
+                  showMessage(json.message || `Removed ${p}`, "success");
+                  await fetchActivities();
+                } else {
+                  showMessage(json.detail || json.message || "Failed to remove participant", "error");
+                }
+              } catch (err) {
+                showMessage(`Network error: ${err.message}`, "error");
+              }
+            });
+
+            li.appendChild(delBtn);
             ul.appendChild(li);
           });
-        } else {
-          const li = document.createElement("li");
-          li.className = "participant empty";
-          li.textContent = "No one has signed up yet.";
-          ul.appendChild(li);
+
+          // attach participants list inside the details and then append details to card
+          addDetail("Participants", ul, "detail-participants");
         }
 
-        card.appendChild(ul);
+        card.appendChild(details);
 
         activitiesList.appendChild(card);
       });

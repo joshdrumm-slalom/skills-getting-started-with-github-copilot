@@ -162,6 +162,9 @@ footer {
   font-weight: 600;
   font-size: 0.95rem;
   list-style: none;    /* extra guard to ensure no bullets show */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .participants-list li.empty {
@@ -171,4 +174,47 @@ footer {
   border-left: 4px solid transparent;
   font-style: italic;
   padding-left: 0;     /* keep the "no participants" line aligned without extra padding */
+}
+
+/* Delete button beside each participant */
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #c62828;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 6px 8px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.delete-btn:hover {
+  background: rgba(198, 40, 40, 0.06);
+  color: #b71c1c;
+}
+
+.participant-name {
+  display: inline-block;
+  margin-right: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* Definition list styling for activity details */
+.activity-details {
+  margin-top: 8px;
+  display: block;
+}
+
+.activity-details .detail-term {
+  font-size: 75%;
+  font-weight: 700;
+  color: #222;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.activity-details .detail-value {
+  margin-bottom: 10px;
+  margin-left: 0; /* keep dd aligned under the dt */
 }
